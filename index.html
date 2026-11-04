@@ -4,15 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aniversário de 35 anos do Vinicius Matoba</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;500;600;700&family=Orbitron:wght@800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg1:#0b0b2e; --bg2:#2a1060; --neon:#7CFF6B; --yellow:#FFD93B; --red:#EE4B4B; --card:rgba(255,255,255,.08);
+    --bg1:#02020d; --bg2:#0e0828; --neon:#8dff7a; --yellow:#FFD93B; --red:#EE4B4B; --card:rgba(6,6,24,.78);
   }
   *{box-sizing:border-box}
   html,body{margin:0;min-height:100%}
   body{
-    font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;color:#fff;
-    background:radial-gradient(circle at 20% 10%,var(--bg2),var(--bg1) 70%) fixed;
+    font-family:'Fredoka','Trebuchet MS','Segoe UI',system-ui,sans-serif;color:#f4f4ff;
+    background:
+      radial-gradient(ellipse at 50% 0%,rgba(80,40,160,.35),transparent 60%),
+      radial-gradient(ellipse at 50% 100%,rgba(20,90,60,.25),transparent 55%),
+      linear-gradient(#02020d,var(--bg2) 55%,#02020d) fixed;
     overflow-x:hidden;
   }
   /* estrelas */
@@ -27,7 +33,7 @@
   @keyframes twinkle{from{opacity:.4}to{opacity:1}}
 
   /* flutuantes */
-  .float{position:fixed;z-index:1;pointer-events:none;font-size:2.2rem;animation:drift linear infinite;opacity:.9}
+  .float{position:fixed;z-index:1;pointer-events:none;font-size:2.2rem;animation:drift linear infinite;opacity:.35;filter:saturate(.8)}
   @keyframes drift{
     0%{transform:translateY(0) rotate(0)}
     50%{transform:translateY(-30px) rotate(10deg)}
@@ -41,20 +47,28 @@
   .screen.active{display:block}
   @keyframes pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
 
-  h1{font-size:clamp(1.8rem,7vw,2.8rem);margin:.2em 0;color:var(--yellow);text-shadow:0 0 18px rgba(255,217,59,.6),3px 3px 0 #c0392b;letter-spacing:1px}
-  .sub{color:var(--neon);font-weight:bold;text-shadow:0 0 10px var(--neon);font-size:1.1rem}
-  .age{font-size:5rem;font-weight:900;line-height:1;background:linear-gradient(#fff36b,#ff9a3b);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px #ff9a3b)}
+  h1{font-family:'Bungee',Impact,sans-serif;font-weight:400;font-size:clamp(1.7rem,7vw,2.6rem);margin:.2em 0;color:var(--yellow);
+     -webkit-text-stroke:2px #1b2a8f;paint-order:stroke fill;text-shadow:0 4px 0 #1b2a8f,0 0 24px rgba(255,217,59,.45);letter-spacing:1px;line-height:1.1}
+  h1 .nome{display:block;font-size:1.25em;color:#fff;-webkit-text-stroke:2px #c0262d;text-shadow:0 4px 0 #c0262d,0 0 26px rgba(238,75,75,.5)}
+  .kicker{font-family:'Press Start 2P',monospace;font-size:.62rem;line-height:1.8;color:var(--neon);letter-spacing:1px;text-shadow:0 0 8px rgba(141,255,122,.6)}
+  .sub{color:var(--neon);font-weight:600;text-shadow:0 1px 6px #000;font-size:1.15rem}
+  .age-wrap{position:relative;display:inline-flex;align-items:center;gap:12px;margin:6px 0 2px}
+  .age{font-family:'Orbitron',sans-serif;font-size:6.5rem;font-weight:900;line-height:1;
+       background:linear-gradient(180deg,#fff7a8 0%,#ffd93b 45%,#ff8a1f 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+       filter:drop-shadow(0 4px 0 #8a3b00) drop-shadow(0 0 18px rgba(255,150,40,.6))}
+  .age-label{font-family:'Bungee',sans-serif;text-align:left;line-height:1.05;font-size:1.5rem;color:#fff;text-shadow:0 3px 0 #1b2a8f}
+  .age-label small{display:block;font-family:'Fredoka',sans-serif;font-size:.9rem;color:var(--neon);text-shadow:none;font-weight:600;letter-spacing:2px}
   .hero{display:flex;justify-content:center;align-items:center;gap:14px;margin:6px 0}
-  .alien{width:96px;filter:drop-shadow(0 0 12px var(--neon));animation:bob 2.5s ease-in-out infinite}
-  .ball{width:70px;animation:spin 4s linear infinite}
+  .alien{width:104px;filter:drop-shadow(0 0 14px rgba(141,255,122,.7));animation:bob 2.5s ease-in-out infinite}
+  .ball{width:72px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.6));animation:spin 6s linear infinite}
   @keyframes bob{50%{transform:translateY(-10px)}}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  .card{background:var(--card);border:2px solid rgba(255,255,255,.2);border-radius:20px;padding:18px;margin:18px 0;backdrop-filter:blur(4px)}
-  .card p{margin:.5em 0;font-size:1.1rem}
+  .card{background:var(--card);border:2px solid rgba(141,255,122,.35);border-radius:20px;padding:18px;margin:18px 0;backdrop-filter:blur(6px);box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 30px rgba(141,255,122,.05)}
+  .card p{margin:.5em 0;font-size:1.15rem}
   .card a{color:var(--yellow)}
 
-  button,.btn{font:inherit;font-weight:bold;font-size:1.15rem;border:none;border-radius:50px;padding:14px 28px;cursor:pointer;color:#fff;transition:transform .15s}
+  button,.btn{font:inherit;font-weight:700;font-size:1.15rem;letter-spacing:.3px;border:none;border-radius:50px;padding:14px 28px;cursor:pointer;color:#fff;transition:transform .15s}
   button:hover{transform:scale(1.05)}
   .yes{background:linear-gradient(#5cf04a,#1fa80f);box-shadow:0 0 20px rgba(124,255,107,.6)}
   .no{background:linear-gradient(#ff6b6b,#b71c1c)}
@@ -88,15 +102,53 @@
   <!-- TELA 1: CONVITE -->
   <section id="s1" class="screen active">
     <div class="hero">
-      <svg class="ball" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="#fff" stroke="#222" stroke-width="6"/><path d="M4 50a46 46 0 0 1 92 0z" fill="#EE1515" stroke="#222" stroke-width="6"/><rect x="4" y="46" width="92" height="8" fill="#222"/><circle cx="50" cy="50" r="13" fill="#fff" stroke="#222" stroke-width="6"/><circle cx="50" cy="50" r="5" fill="#ddd"/></svg>
-      <svg class="alien" viewBox="0 0 100 110" aria-hidden="true"><ellipse cx="50" cy="48" rx="38" ry="44" fill="#7CFF6B" stroke="#2c7a22" stroke-width="3"/><ellipse cx="32" cy="46" rx="11" ry="19" fill="#111" transform="rotate(-22 32 46)"/><ellipse cx="68" cy="46" rx="11" ry="19" fill="#111" transform="rotate(22 68 46)"/><circle cx="29" cy="40" r="3" fill="#fff"/><circle cx="71" cy="40" r="3" fill="#fff"/><path d="M40 76q10 7 20 0" stroke="#2c7a22" stroke-width="3" fill="none" stroke-linecap="round"/><line x1="30" y1="8" x2="22" y2="-2" stroke="#2c7a22" stroke-width="3"/><circle cx="21" cy="-2" r="4" fill="#FFD93B"/><line x1="70" y1="8" x2="78" y2="-2" stroke="#2c7a22" stroke-width="3"/><circle cx="79" cy="-2" r="4" fill="#FFD93B"/></svg>
-      <svg class="ball" viewBox="0 0 100 100" aria-hidden="true" style="animation-direction:reverse"><circle cx="50" cy="50" r="46" fill="#fff" stroke="#222" stroke-width="6"/><path d="M4 50a46 46 0 0 1 92 0z" fill="#3b6fe0" stroke="#222" stroke-width="6"/><rect x="4" y="46" width="92" height="8" fill="#222"/><circle cx="50" cy="50" r="13" fill="#fff" stroke="#222" stroke-width="6"/><circle cx="50" cy="50" r="5" fill="#ddd"/></svg>
+      <svg class="ball" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <radialGradient id="rTop" cx="35%" cy="25%" r="80%"><stop offset="0" stop-color="#ff7a7a"/><stop offset=".5" stop-color="#e3262d"/><stop offset="1" stop-color="#8a0f16"/></radialGradient>
+          <radialGradient id="rBot" cx="35%" cy="30%" r="85%"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#e4e4ee"/><stop offset="1" stop-color="#a9a9bd"/></radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="46" fill="url(#rBot)" stroke="#15151f" stroke-width="5"/>
+        <path d="M4.5 50a45.5 45.5 0 0 1 91 0z" fill="url(#rTop)" stroke="#15151f" stroke-width="5" stroke-linejoin="round"/>
+        <rect x="4" y="45.5" width="92" height="9" fill="#15151f"/>
+        <circle cx="50" cy="50" r="14" fill="#fff" stroke="#15151f" stroke-width="5"/>
+        <circle cx="50" cy="50" r="6" fill="#d9d9e6" stroke="#15151f" stroke-width="2"/>
+        <ellipse cx="30" cy="26" rx="10" ry="5" fill="#fff" opacity=".55" transform="rotate(-35 30 26)"/>
+      </svg>
+      <svg class="alien" viewBox="-5 -15 110 130" aria-hidden="true">
+        <defs>
+          <radialGradient id="aSkin" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#d6ffc9"/><stop offset=".45" stop-color="#8dff7a"/><stop offset="1" stop-color="#2fa83a"/></radialGradient>
+          <radialGradient id="aEye" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#3a3a5c"/><stop offset=".5" stop-color="#0a0a14"/><stop offset="1" stop-color="#000"/></radialGradient>
+        </defs>
+        <path d="M50 4C20 4 6 32 10 56c3 20 18 34 32 40q8 4 16 0c14-6 29-20 32-40C94 32 80 4 50 4z" fill="url(#aSkin)" stroke="#1f7a2c" stroke-width="3"/>
+        <path d="M32 62c-9-6-19-18-16-28 10 2 22 12 25 22z" fill="url(#aEye)" stroke="#05150a" stroke-width="2"/>
+        <path d="M68 62c9-6 19-18 16-28-10 2-22 12-25 22z" fill="url(#aEye)" stroke="#05150a" stroke-width="2"/>
+        <ellipse cx="26" cy="46" rx="3.2" ry="5" fill="#fff" opacity=".9" transform="rotate(-30 26 46)"/>
+        <ellipse cx="74" cy="46" rx="3.2" ry="5" fill="#fff" opacity=".9" transform="rotate(30 74 46)"/>
+        <path d="M42 80q8 5 16 0" stroke="#1f7a2c" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="46" cy="70" r="1.3" fill="#1f7a2c"/><circle cx="54" cy="70" r="1.3" fill="#1f7a2c"/>
+        <path d="M34 10 24 -4M66 10 76 -4" stroke="#1f7a2c" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="23" cy="-5" r="5" fill="#FFD93B" stroke="#a87b00" stroke-width="2"/><circle cx="77" cy="-5" r="5" fill="#FFD93B" stroke="#a87b00" stroke-width="2"/>
+        <ellipse cx="36" cy="18" rx="9" ry="4" fill="#fff" opacity=".45" transform="rotate(-30 36 18)"/>
+      </svg>
+      <svg class="ball" viewBox="0 0 100 100" aria-hidden="true" style="animation-direction:reverse">
+        <defs>
+          <radialGradient id="bTop" cx="35%" cy="25%" r="80%"><stop offset="0" stop-color="#8fb4ff"/><stop offset=".5" stop-color="#2f62dd"/><stop offset="1" stop-color="#14306f"/></radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="46" fill="url(#rBot)" stroke="#15151f" stroke-width="5"/>
+        <path d="M4.5 50a45.5 45.5 0 0 1 91 0z" fill="url(#bTop)" stroke="#15151f" stroke-width="5" stroke-linejoin="round"/>
+        <rect x="4" y="45.5" width="92" height="9" fill="#15151f"/>
+        <circle cx="50" cy="50" r="14" fill="#fff" stroke="#15151f" stroke-width="5"/>
+        <circle cx="50" cy="50" r="6" fill="#d9d9e6" stroke="#15151f" stroke-width="2"/>
+        <ellipse cx="30" cy="26" rx="10" ry="5" fill="#fff" opacity=".55" transform="rotate(-35 30 26)"/>
+      </svg>
     </div>
 
-    <div class="sub">👽 Missão intergaláctica: capturar todos os convidados! ⚡</div>
-    <h1>Aniversário do<br>Vinicius Matoba</h1>
-    <div class="age">35</div>
-    <div class="sub">anos de evolução!</div>
+    <div class="kicker">★ MISSÃO INTERGALÁCTICA ★<br>CONFIRME SUA PRESENÇA</div>
+    <h1>Aniversário<span class="nome">Vinicius Matoba</span></h1>
+    <div class="age-wrap">
+      <div class="age">35</div>
+      <div class="age-label">ANOS<small>EVOLUÇÃO COMPLETA</small></div>
+    </div>
 
     <div class="card">
       <p>📅 <b>14 de novembro de 2026</b> (sábado)</p>
