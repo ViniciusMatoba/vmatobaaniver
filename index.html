@@ -89,11 +89,18 @@
   .comp-row{display:flex;gap:8px;margin-top:8px}
   .comp-row button{padding:0 16px;background:var(--red);font-size:1.2rem}
   .add{background:linear-gradient(#ffe55c,#e0a800);color:#222;margin-top:12px;font-size:1rem;padding:10px 20px}
+  .list-title{font-family:'Bungee',sans-serif;font-weight:400;font-size:1.2rem;color:var(--yellow);margin:0 0 4px}
+  .guest-count{color:var(--neon);font-weight:600;margin-bottom:8px}
+  .guest-list{list-style:none;margin:0;padding:0;text-align:left;max-height:320px;overflow:auto}
+  .guest-list li{padding:9px 12px;margin:6px 0;background:rgba(255,255,255,.06);border-left:4px solid var(--neon);border-radius:10px}
+  .guest-list li span{opacity:.8}
+  .countdown{margin:14px 0}
+  .countdown .age{font-size:8rem}
+  .cd-label{font-family:'Bungee',sans-serif;font-size:1.5rem;color:#fff;text-shadow:0 3px 0 #1b2a8f}
+  .cd-sub{font-family:'Orbitron',sans-serif;font-weight:800;color:var(--neon);margin-top:8px;font-size:1.1rem;letter-spacing:2px}
   .hint{font-size:.9rem;opacity:.8;text-align:left;margin-top:4px}
   .error{color:#ff8a8a;font-weight:bold;min-height:1.4em;margin-top:8px}
   .big{font-size:4rem}
-  .admin{display:none;text-align:left;margin-top:30px}
-  .admin li{margin:4px 0}
   small.foot{display:block;margin-top:30px;opacity:.6}
 </style>
 </head>
@@ -200,24 +207,43 @@
     <button type="button" id="back" style="background:none;text-decoration:underline;font-size:.95rem">← voltar</button>
   </section>
 
-  <!-- TELA 3: OBRIGADO -->
+  <!-- TELA 3: OBRIGADO + LISTA -->
   <section id="s3" class="screen">
     <div class="big">🛸🎂⚡</div>
     <h1>Presença confirmada!</h1>
     <div class="card">
       <p id="resumo"></p>
       <p>Te espero dia <b>14/11 às 14:00</b><br>na Casa da Lari (Rua Ariovaldo Pinto, 61)!</p>
-      <p>👽 Leve seus Pokémon e traga sua nave! ⚡</p>
+    </div>
+    <div class="card">
+      <h2 class="list-title">👾 Quem já confirmou</h2>
+      <div class="guest-count"></div>
+      <ul class="guest-list"></ul>
     </div>
     <div class="actions">
-      <a id="wa" class="btn yes" target="_blank" rel="noopener" style="text-decoration:none">📲 Avisar o Vinicius no WhatsApp</a>
+      <button type="button" class="yes" id="toCountdown">⏳ Ver contagem regressiva</button>
     </div>
   </section>
 
-  <!-- LISTA (acesse com #lista no final do endereço) -->
-  <section class="admin card" id="admin">
-    <h2>📋 Confirmações neste aparelho</h2>
-    <ul id="lista"></ul>
+  <!-- TELA 4: CONTAGEM REGRESSIVA -->
+  <section id="s4" class="screen">
+    <div class="big">🚀👽⚡</div>
+    <div class="kicker">TREINADOR(A) <span id="olaNome"></span>,<br>A MISSÃO COMEÇA EM</div>
+    <div class="countdown">
+      <div class="age" id="cdDias">--</div>
+      <div class="cd-label" id="cdLabel"></div>
+      <div class="cd-sub" id="cdSub"></div>
+    </div>
+    <div class="card">
+      <p>📅 <b>14/11/2026</b> às <b>14:00</b></p>
+      <p>📍 Casa da Lari<br>Rua Ariovaldo Pinto, 61<br>
+        <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Rua+Ariovaldo+Pinto+61">Ver no mapa</a></p>
+    </div>
+    <div class="card">
+      <h2 class="list-title">👾 Quem já confirmou</h2>
+      <div class="guest-count"></div>
+      <ul class="guest-list"></ul>
+    </div>
   </section>
 
   <small class="foot">👽 Os ETs e os Pokémon aprovam. 🔴⚪</small>
@@ -225,8 +251,10 @@
 
 <script>
 /* ===== CONFIGURAÇÃO ===== */
-// Coloque o WhatsApp do Vinicius com DDI+DDD, só números. Ex.: "5511999999999"
-const WHATSAPP = "";
+// Endereço do Firebase Realtime Database (sem barra no final), para a lista ser compartilhada
+// entre todos os convidados. Ex.: "https://vmatoba-aniver-default-rtdb.firebaseio.com"
+// Se ficar vazio, a lista só funciona neste aparelho (útil para testes).
+const DB_URL = "";
 
 /* ===== Decoração flutuante ===== */
 const deco = ["👽","🛸","⚡","🔥","💧","🌿","🌟","👾","🌙","🪐"];
@@ -319,44 +347,97 @@ function addComp(value = "") {
 }
 document.getElementById("addComp").onclick = () => addComp();
 
-/* ===== Envio ===== */
-const KEY = "aniversario-vinicius-35";
-document.getElementById("form").addEventListener("submit", e => {
+/* ===== Envio, lista compartilhada e contagem regressiva ===== */
+const KEY_ME = "vm35-confirmado";   // guarda neste aparelho quem já confirmou
+const KEY_LOCAL = "vm35-lista-local"; // usado só se o banco online não estiver configurado
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+const store = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch (_) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} }
+};
+
+// Lê a lista de convidados (online se configurado, senão deste aparelho)
+async function carregarLista() {
+  if (!DB_URL) return store.get(KEY_LOCAL) || [];
+  const r = await fetch(`${DB_URL}/convidados.json`);
+  if (!r.ok) throw new Error("falha ao ler");
+  const data = (await r.json()) || {};
+  return Object.values(data).sort((a, b) => (a.em || "").localeCompare(b.em || ""));
+}
+async function salvarConvidado(item) {
+  if (!DB_URL) { const l = store.get(KEY_LOCAL) || []; l.push(item); store.set(KEY_LOCAL, l); return; }
+  const r = await fetch(`${DB_URL}/convidados.json`, { method: "POST", body: JSON.stringify(item) });
+  if (!r.ok) throw new Error("falha ao salvar");
+}
+
+function renderLista(lista) {
+  const pessoas = lista.reduce((n, p) => n + 1 + (p.acomp ? p.acomp.length : 0), 0);
+  const html = lista.length
+    ? lista.map(p => `<li><b>${esc(p.nome)}</b>${p.acomp && p.acomp.length ? `<span> + ${esc(p.acomp.join(", "))}</span>` : ""}</li>`).join("")
+    : "<li>Seja o primeiro da lista! 🚀</li>";
+  const titulo = lista.length ? `${pessoas} ${pessoas === 1 ? "pessoa confirmada" : "pessoas confirmadas"}` : "Ninguém ainda";
+  document.querySelectorAll(".guest-list").forEach(el => el.innerHTML = html);
+  document.querySelectorAll(".guest-count").forEach(el => el.textContent = titulo);
+}
+async function atualizarLista() {
+  try { renderLista(await carregarLista()); }
+  catch (_) { document.querySelectorAll(".guest-list").forEach(el => el.innerHTML = "<li>Não consegui carregar a lista agora.</li>"); }
+}
+
+document.getElementById("form").addEventListener("submit", async e => {
   e.preventDefault();
   const nome = document.getElementById("nome").value.trim();
   const acomp = [...comps.querySelectorAll("input")].map(i => i.value.trim()).filter(Boolean);
   if (!nome) { document.getElementById("err").textContent = "Escreva seu nome, treinador(a)! 😄"; return; }
   document.getElementById("err").textContent = "";
 
-  try {
-    const lista = JSON.parse(localStorage.getItem(KEY) || "[]");
-    lista.push({ nome, acomp, em: new Date().toISOString() });
-    localStorage.setItem(KEY, JSON.stringify(lista));
-  } catch (_) { /* armazenamento indisponível: segue o fluxo mesmo assim */ }
+  const btn = e.submitter; if (btn) btn.disabled = true;
+  const item = { nome, acomp, em: new Date().toISOString() };
+  let salvou = true;
+  try { await salvarConvidado(item); } catch (_) { salvou = false; }
+  if (btn) btn.disabled = false;
+  if (!salvou) { document.getElementById("err").textContent = "Não consegui enviar agora. Tente de novo em instantes."; return; }
 
+  store.set(KEY_ME, item);
   const total = 1 + acomp.length;
   document.getElementById("resumo").innerHTML =
     `Valeu, <b>${esc(nome)}</b>! ` +
     (acomp.length ? `Você vai com <b>${esc(acomp.join(", "))}</b> (${total} pessoas).` : `Anotei você (1 pessoa).`);
-
-  const texto = `Confirmado! 🎉 Aqui é ${nome}` +
-    (acomp.length ? `, vou com: ${acomp.join(", ")} (${total} pessoas)` : `, vou sozinho(a)`) +
-    ` no seu aniversário de 35 anos dia 14/11! 👽⚡`;
-  document.getElementById("wa").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(texto)}`;
   show("s3");
+  atualizarLista();
 });
-function esc(s){ return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
-/* ===== Lista (#lista) ===== */
-if (location.hash === "#lista") {
-  const a = document.getElementById("admin");
-  a.style.display = "block";
-  let l = [];
-  try { l = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (_) {}
-  document.getElementById("lista").innerHTML = l.length
-    ? l.map(p => `<li><b>${esc(p.nome)}</b>${p.acomp.length ? " + " + esc(p.acomp.join(", ")) : ""}</li>`).join("")
-    : "<li>Nenhuma confirmação ainda.</li>";
+/* Contagem regressiva */
+const FESTA = new Date(2026, 10, 14, 14, 0, 0); // 14/11/2026 14:00 (horário local)
+function tick() {
+  const diff = FESTA - new Date();
+  const big = document.getElementById("cdDias"), lab = document.getElementById("cdLabel"), sub = document.getElementById("cdSub");
+  if (diff <= 0) {
+    const mesmoDia = new Date().toDateString() === FESTA.toDateString();
+    big.textContent = mesmoDia ? "HOJE" : "🎉";
+    lab.textContent = mesmoDia ? "É a festa do Vinicius!" : "A festa já rolou!";
+    sub.textContent = "";
+    return;
+  }
+  const d = Math.floor(diff / 864e5), h = Math.floor(diff / 36e5) % 24, m = Math.floor(diff / 6e4) % 60, s = Math.floor(diff / 1e3) % 60;
+  big.textContent = d;
+  lab.textContent = d === 1 ? "dia para a festa!" : "dias para a festa!";
+  sub.textContent = `${h}h ${String(m).padStart(2, "0")}min ${String(s).padStart(2, "0")}s`;
 }
+setInterval(tick, 1000); tick();
+document.getElementById("toCountdown").onclick = () => show("s4");
+document.getElementById("toList").onclick = () => show("s3");
+
+/* Quem já confirmou neste aparelho vai direto para a contagem regressiva */
+(function () {
+  const eu = store.get(KEY_ME);
+  if (eu && eu.nome) {
+    document.getElementById("olaNome").textContent = eu.nome;
+    show("s4");
+    atualizarLista();
+  }
+})();
 </script>
 </body>
 </html>
