@@ -173,6 +173,7 @@
       <button class="yes" id="yesBtn">✅ Confirmar presença</button>
       <button class="no" id="noBtn">❌ Não vou</button>
     </div>
+    <button type="button" id="jaConfirmei" style="background:none;text-decoration:underline;font-size:.95rem;opacity:.85">Já confirmei, ver contagem regressiva</button>
   </section>
 
   <!-- MODAL das mensagens -->
@@ -352,9 +353,21 @@ const KEY_ME = "vm35-confirmado";   // guarda neste aparelho quem já confirmou
 const KEY_LOCAL = "vm35-lista-local"; // usado só se o banco online não estiver configurado
 
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+// Guarda no aparelho: localStorage e, como reserva, cookie (alguns navegadores embutidos bloqueiam um deles)
 const store = {
-  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch (_) { return null; } },
-  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} }
+  get(k){
+    try { const v = localStorage.getItem(k); if (v) return JSON.parse(v); } catch (_) {}
+    try {
+      const m = document.cookie.split("; ").find(c => c.startsWith(k + "="));
+      if (m) return JSON.parse(decodeURIComponent(m.slice(k.length + 1)));
+    } catch (_) {}
+    return null;
+  },
+  set(k, v){
+    const s = JSON.stringify(v);
+    try { localStorage.setItem(k, s); } catch (_) {}
+    try { document.cookie = `${k}=${encodeURIComponent(s)}; max-age=${60*60*24*365}; path=/; SameSite=Lax`; } catch (_) {}
+  }
 };
 
 // Lê a lista de convidados (online se configurado, senão deste aparelho)
@@ -427,11 +440,15 @@ function tick() {
 }
 setInterval(tick, 1000); tick();
 document.getElementById("toCountdown").onclick = () => show("s4");
-document.getElementById("toList").onclick = () => show("s3");
+document.getElementById("jaConfirmei").onclick = () => { show("s4"); atualizarLista(); };
 
 /* Quem já confirmou neste aparelho vai direto para a contagem regressiva */
 (function () {
-  const eu = store.get(KEY_ME);
+  let eu = store.get(KEY_ME);
+  if (!eu) { // versão antiga da página: migra quem já tinha confirmado
+    const antigos = store.get("aniversario-vinicius-35");
+    if (antigos && antigos.length) { eu = antigos[antigos.length - 1]; store.set(KEY_ME, eu); }
+  }
   if (eu && eu.nome) {
     document.getElementById("olaNome").textContent = eu.nome;
     show("s4");
